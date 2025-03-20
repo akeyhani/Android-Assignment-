@@ -2,6 +2,7 @@ package com.example.expensetracker
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.DatePicker
 import android.widget.EditText
@@ -23,6 +24,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("ExpenseTrackerLog","onCreate")
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         recycleView = findViewById(R.id.expenseList)
@@ -74,5 +76,29 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("ExpenseTrackerLog","onStart is called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("ExpenseTrackerLog","onPause is called")
+    }
+    override fun onResume() {
+        super.onResume()
+        Log.d("ExpenseTrackerLog","onResume is called")
+    }
+    override fun onStop() {
+        super.onStop()
+        Log.d("ExpenseTrackerLog","onStop is called")
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("ExpenseTrackerLog","onDestroy is called")
     }
 }
