@@ -1,6 +1,8 @@
 package com.example.expensetracker
 
 import android.app.DatePickerDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dateInput: EditText
     private lateinit var recycleView: RecyclerView
     private lateinit var submitButton: Button
+    private lateinit var financialTip: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,11 +35,12 @@ class MainActivity : AppCompatActivity() {
         amount = findViewById(R.id.amount)
         dateInput = findViewById(R.id.expenseDate)
         submitButton = findViewById(R.id.addExpense)
+        financialTip = findViewById(R.id.finsTips)
 
         var expenseList = mutableListOf(
             ExpenseItem("item1", 100.0, "2025-03-20")
         )
-       val adapter = RecAdapter(expenseList)
+       val adapter = RecycleAdapter(this,expenseList)
         recycleView.adapter = adapter
         recycleView.layoutManager = LinearLayoutManager(this)
 
@@ -70,6 +74,12 @@ class MainActivity : AppCompatActivity() {
                 ,year,month,day
             )
             datePicker.show()
+        }
+        financialTip.setOnClickListener {
+            val financialTipsUrl = "https://www.themuse.com/advice/50-personal-finance-tips-that-will-change-the-way-you-think-about-money"
+            //using action view to open the browser in the system
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(financialTipsUrl))
+            startActivity(intent)
         }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
