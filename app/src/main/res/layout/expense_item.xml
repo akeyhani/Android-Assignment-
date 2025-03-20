@@ -18,11 +18,11 @@
         android:id="@+id/amount_item"
         android:layout_width="74dp"
         android:layout_height="21dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
         android:text="amount"
+        app:layout_constraintStart_toEndOf="@+id/name_item"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="113dp" />
-
+        app:layout_constraintBottom_toBottomOf="parent" />
     <Button
         android:id="@+id/delete_item"
         android:layout_width="111dp"
