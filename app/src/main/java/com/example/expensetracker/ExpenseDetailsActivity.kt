@@ -30,14 +30,12 @@ class ExpenseDetailsActivity : AppCompatActivity() {
         expenseDate = findViewById(R.id.detailDate)
         backHome = findViewById(R.id.backHome)
 
-        //show the detail from item passed by main activity
         name.setText("Expense Name: ${item?.name}")
         expenseAmount.setText("Expense Amount: ${item?.amount.toString()}")
         expenseDate.setText("Expense Date: ${item?.date.toString()}")
 
-        //go back to home activity
         backHome.setOnClickListener {
-            finish() // Close the current activity and go back
+            finish()
         }
 
     }

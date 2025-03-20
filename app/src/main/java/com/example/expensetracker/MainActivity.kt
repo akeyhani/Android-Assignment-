@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recycleView: RecyclerView
     private lateinit var submitButton: Button
     private lateinit var financialTip: Button
+    private lateinit var expenseList: MutableList<ExpenseItem>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,10 +38,11 @@ class MainActivity : AppCompatActivity() {
         submitButton = findViewById(R.id.addExpense)
         financialTip = findViewById(R.id.finsTips)
 
-        var expenseList = mutableListOf(
+        expenseList = mutableListOf(
+       // var expenseList = mutableListOf(
             ExpenseItem("item1", 100.0, "2025-03-20")
         )
-       val adapter = RecycleAdapter(this,expenseList)
+       val adapter = RecycleAdapter(this,this,expenseList)
         recycleView.adapter = adapter
         recycleView.layoutManager = LinearLayoutManager(this)
 
@@ -60,6 +62,7 @@ class MainActivity : AppCompatActivity() {
                 amount.setText("")
                 dateInput.setText("")
             }
+            updateTotalExpense()
 
         }
         dateInput.setOnClickListener {
@@ -77,10 +80,26 @@ class MainActivity : AppCompatActivity() {
         }
         financialTip.setOnClickListener {
             val financialTipsUrl = "https://www.themuse.com/advice/50-personal-finance-tips-that-will-change-the-way-you-think-about-money"
-            //using action view to open the browser in the system
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(financialTipsUrl))
             startActivity(intent)
         }
+         val headerFragment = HeaderFragment.newInstance()
+        val footerFragment = FooterFragment.newInstance()
+
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.add(R.id.headerFragment, headerFragment)
+        transaction.add(R.id.footerFragment, footerFragment)
+        transaction.commit()
+
+        val transaction2 = supportFragmentManager.beginTransaction()
+        transaction2.replace(R.id.headerFragment, headerFragment)
+        transaction2.addToBackStack(null) // Optional: Add to back stack
+        transaction2.commit()
+        updateTotalExpense()
+    }
+    fun updateTotalExpense(){
+        val footer = supportFragmentManager.findFragmentById(R.id.footerFragment) as FooterFragment?
+        footer?.updateTotalExpensesDisplay(expenseList.sumOf { it.amount })
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

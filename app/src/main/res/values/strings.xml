@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Expense Tracker</string>
+    <string name="hello_blank_fragment">Blank fragment</string>
 </resources>
