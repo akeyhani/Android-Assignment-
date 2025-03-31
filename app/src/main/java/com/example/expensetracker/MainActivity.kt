@@ -16,7 +16,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.util.Calendar
+import android.content.Context
+import com.google.gson.reflect.TypeToken
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
 
+
+private const val FILE_NAME = "expenseList.txt"
 class MainActivity : AppCompatActivity() {
     private lateinit var nameExpense: EditText
     private lateinit var amount: EditText
@@ -38,10 +45,15 @@ class MainActivity : AppCompatActivity() {
         submitButton = findViewById(R.id.addExpense)
         financialTip = findViewById(R.id.finsTips)
 
-        expenseList = mutableListOf(
+      /*  expenseList = mutableListOf(
        // var expenseList = mutableListOf(
             ExpenseItem("item1", 100.0, "2025-03-20")
         )
+
+       */
+        expenseList=loadListFromFile()
+        updateTotalExpense()
+
        val adapter = RecycleAdapter(this,this,expenseList)
         recycleView.adapter = adapter
         recycleView.layoutManager = LinearLayoutManager(this)
@@ -96,6 +108,31 @@ class MainActivity : AppCompatActivity() {
         transaction2.addToBackStack(null) // Optional: Add to back stack
         transaction2.commit()
         updateTotalExpense()
+    }
+     fun saveListToFile(){
+        try{
+            val json = Gson().toJson(expenseList)
+            openFileOutput(FILE_NAME, Context.MODE_PRIVATE).use{ output -> output.write(json.toByteArray())}
+        }catch (e: IOException){
+            Log.d("fileManager", e.message.toString())
+            e.printStackTrace()
+        }
+    }
+     fun loadListFromFile(): MutableList<ExpenseItem>{
+        val loadedList = mutableListOf<ExpenseItem>()
+        try{
+            val file = File(filesDir, FILE_NAME)
+            if(!file.exists())return loadedList
+            val json = file.readText()
+            val type = object : TypeToken<List<ExpenseItem>>(){}.type
+            val listFromFile: List<ExpenseItem> = Gson().fromJson(json, type)
+            loadedList.addAll(listFromFile)
+        }catch (e: FileNotFoundException){
+            Log.d("FileManager", e.message.toString())
+        } catch (e: IOException){
+            Log.d("FileManager", e.message.toString())
+        }
+        return loadedList
     }
     fun updateTotalExpense(){
         val footer = supportFragmentManager.findFragmentById(R.id.footerFragment) as FooterFragment?

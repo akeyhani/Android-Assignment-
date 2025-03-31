@@ -29,6 +29,7 @@ class RecycleAdapter(private val activity: MainActivity, private val context: Co
                 expenseList.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
                 activity.updateTotalExpense()
+                activity.saveListToFile()
             }
             showDetail.setOnClickListener {
                 val item = expenseList[position]
