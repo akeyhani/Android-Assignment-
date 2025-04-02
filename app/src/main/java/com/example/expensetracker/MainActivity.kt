@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +14,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.expenseapp.util.FileHelper
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
@@ -28,9 +28,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("ExpenseTrackerLog","onCreate")
+        Log.d("ExpenseTrackerLog", "onCreate")
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
         recycleView = findViewById(R.id.expenseList)
         nameExpense = findViewById(R.id.expenseName)
         amount = findViewById(R.id.amount)
@@ -38,52 +39,59 @@ class MainActivity : AppCompatActivity() {
         submitButton = findViewById(R.id.addExpense)
         financialTip = findViewById(R.id.finsTips)
 
-        expenseList = mutableListOf(
-       // var expenseList = mutableListOf(
-            ExpenseItem("item1", 100.0, "2025-03-20")
-        )
-       val adapter = RecycleAdapter(this,this,expenseList)
+        expenseList = mutableListOf()
+
+        val adapter = RecycleAdapter(this, this, expenseList)
         recycleView.adapter = adapter
         recycleView.layoutManager = LinearLayoutManager(this)
 
+        // Load from file
+        expenseList.clear()
+        expenseList.addAll(FileHelper.readFromFile(this))
+        adapter.notifyDataSetChanged()
+
         submitButton.setOnClickListener {
-           // expenseList.add(ExpenseItem(nameExpense.text.toString(), amount.text.toString().toDouble(), dateInput.text.toString()))
-            adapter.notifyDataSetChanged()
             val name = nameExpense.text.toString().trim()
             val amt = amount.text.toString().trim()
             val date = dateInput.text.toString().trim()
-            if(name.isNullOrEmpty() || (amt.isNullOrEmpty() || amt.toDoubleOrNull() == null) || date.isNullOrEmpty()){
-                Toast.makeText(this,"Invalid Input",Toast.LENGTH_SHORT).show()
-            }else{
 
-                expenseList.add(ExpenseItem(name, amt.toDouble(),date))
-                adapter.notifyDataSetChanged()//notify change to the view
+            if (name.isEmpty() || amt.isEmpty() || amt.toDoubleOrNull() == null || date.isEmpty()) {
+                Toast.makeText(this, "Invalid Input", Toast.LENGTH_SHORT).show()
+            } else {
+                expenseList.add(ExpenseItem(name, amt.toDouble(), date))
+                adapter.notifyDataSetChanged()
+                FileHelper.writeToFile(this, expenseList) // Save to file here
+
                 nameExpense.setText("")
                 amount.setText("")
                 dateInput.setText("")
             }
-            updateTotalExpense()
 
+            updateTotalExpense()
         }
+
         dateInput.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
             val month = calendar.get(Calendar.MONTH)
             val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-            val datePicker: DatePickerDialog = DatePickerDialog(this,
-                {_, selectedYear, selectedMonth, selectedDay ->
-                    dateInput.setText("$selectedYear-${selectedMonth+1}-$selectedDay")}
-                ,year,month,day
+            val datePicker = DatePickerDialog(this,
+                { _, selectedYear, selectedMonth, selectedDay ->
+                    dateInput.setText("$selectedYear-${selectedMonth + 1}-$selectedDay")
+                },
+                year, month, day
             )
             datePicker.show()
         }
+
         financialTip.setOnClickListener {
             val financialTipsUrl = "https://www.themuse.com/advice/50-personal-finance-tips-that-will-change-the-way-you-think-about-money"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(financialTipsUrl))
             startActivity(intent)
         }
-         val headerFragment = HeaderFragment.newInstance()
+
+        val headerFragment = HeaderFragment.newInstance()
         val footerFragment = FooterFragment.newInstance()
 
         val transaction = supportFragmentManager.beginTransaction()
@@ -93,13 +101,16 @@ class MainActivity : AppCompatActivity() {
 
         val transaction2 = supportFragmentManager.beginTransaction()
         transaction2.replace(R.id.headerFragment, headerFragment)
-        transaction2.addToBackStack(null) // Optional: Add to back stack
+        transaction2.addToBackStack(null)
         transaction2.commit()
+
         updateTotalExpense()
     }
-    fun updateTotalExpense(){
+
+    fun updateTotalExpense() {
         val footer = supportFragmentManager.findFragmentById(R.id.footerFragment) as FooterFragment?
         footer?.updateTotalExpensesDisplay(expenseList.sumOf { it.amount })
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -109,25 +120,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d("ExpenseTrackerLog","onStart is called")
+        Log.d("ExpenseTrackerLog", "onStart is called")
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d("ExpenseTrackerLog","onPause is called")
-    }
-    override fun onResume() {
-        super.onResume()
-        Log.d("ExpenseTrackerLog","onResume is called")
-    }
-    override fun onStop() {
-        super.onStop()
-        Log.d("ExpenseTrackerLog","onStop is called")
+        Log.d("ExpenseTrackerLog", "onPause is called")
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d("ExpenseTrackerLog", "onResume is called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("ExpenseTrackerLog", "onStop is called")
+    }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("ExpenseTrackerLog","onDestroy is called")
+        Log.d("ExpenseTrackerLog", "onDestroy is called")
     }
 }
