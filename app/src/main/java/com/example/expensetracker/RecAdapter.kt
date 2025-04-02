@@ -6,7 +6,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class RecycleAdapter(private val activity: MainActivity, private val context: Context, var expenseList: MutableList<ExpenseItem>): RecyclerView.Adapter<RecView>() {
+class RecycleAdapter(
+    private val context: Context,
+    private val expenseList: MutableList<ExpenseItem>,
+    private val onDataChanged: () -> Unit // 👈 NEW: callback from fragment
+) : RecyclerView.Adapter<RecView>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecView {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.expense_item, parent, false)
@@ -18,26 +23,29 @@ class RecycleAdapter(private val activity: MainActivity, private val context: Co
     }
 
     override fun onBindViewHolder(holder: RecView, position: Int) {
-        val expense = expenseList[position] // Get correct item
+        val expense = expenseList[position]
 
         holder.apply {
             nameItem.text = expense.name
             amountItem.text = expense.amount.toString()
 
             deleteButton.setOnClickListener {
-                // Remove item from list and update RecyclerView
                 expenseList.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
-                activity.updateTotalExpense()
+
+                // Save the updated list to file
+                FileHelper.writeToFile(context, expenseList)
+
+                onDataChanged() // update total, UI etc.
             }
+
+
             showDetail.setOnClickListener {
                 val item = expenseList[position]
                 val intent = Intent(context, ExpenseDetailsActivity::class.java)
-                intent.putExtra("DETAIL", item) // add the data
+                intent.putExtra("DETAIL", item)
                 context.startActivity(intent)
             }
         }
     }
 }
-
-
