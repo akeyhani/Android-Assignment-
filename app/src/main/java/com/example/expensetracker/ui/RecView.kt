@@ -1,11 +1,11 @@
-package com.example.expensetracker
+package com.example.expensetracker.ui
 
 
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.example.expensetracker.R
 
 class RecView(itemView: View): RecyclerView.ViewHolder(itemView) {
     lateinit var nameItem: TextView

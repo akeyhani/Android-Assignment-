@@ -1,7 +1,8 @@
-package com.example.expensetracker
+package com.example.expensetracker.utils
 
 import android.content.Context
 import android.util.Log
+import com.example.expensetracker.model.ExpenseItem
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

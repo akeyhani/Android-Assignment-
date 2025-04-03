@@ -1,10 +1,12 @@
-package com.example.expensetracker
+package com.example.expensetracker.ui
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.example.expensetracker.model.ExpenseItem
+import com.example.expensetracker.R
 
 
 class ExpenseDetailsActivity : AppCompatActivity() {

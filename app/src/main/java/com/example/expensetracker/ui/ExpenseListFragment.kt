@@ -1,4 +1,4 @@
-package com.example.expensetracker
+package com.example.expensetracker.ui
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -13,7 +13,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 import androidx.lifecycle.lifecycleScope
+import com.example.expensetracker.model.ExpenseItem
+import com.example.expensetracker.headerfooter.FooterFragment
+import com.example.expensetracker.R
+import com.example.expensetracker.adapters.RecycleAdapter
 import com.example.expensetracker.network.RetrofitInstance
+import com.example.expensetracker.utils.FileHelper
 import kotlinx.coroutines.launch
 
 class ExpenseListFragment : Fragment() {
@@ -136,7 +141,7 @@ class ExpenseListFragment : Fragment() {
                     }
                 }
 
-                expenseList.add(ExpenseItem(name, amountValue, date))
+                expenseList.add(ExpenseItem(name, amountValue, date, "CAD"))
                 FileHelper.writeToFile(requireContext(), expenseList)
                 adapter.notifyDataSetChanged()
                 updateTotalExpense()

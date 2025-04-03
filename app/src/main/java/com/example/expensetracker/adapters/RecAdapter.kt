@@ -1,10 +1,15 @@
-package com.example.expensetracker
+package com.example.expensetracker.adapters
 
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.expensetracker.R
+import com.example.expensetracker.model.ExpenseItem
+import com.example.expensetracker.ui.ExpenseDetailsActivity
+import com.example.expensetracker.ui.RecView
+import com.example.expensetracker.utils.FileHelper
 
 class RecycleAdapter(
     private val context: Context,
@@ -27,8 +32,7 @@ class RecycleAdapter(
 
         holder.apply {
             nameItem.text = expense.name
-            amountItem.text = expense.amount.toString()
-
+            amountItem.text = String.format("%.2f %s", expense.amount, expense.currency.uppercase())
             deleteButton.setOnClickListener {
                 expenseList.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
