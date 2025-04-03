@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 
 class ExpenseListFragment : Fragment() {
 
-
     private lateinit var nameExpense: EditText
     private lateinit var amount: EditText
     private lateinit var dateInput: EditText
@@ -42,7 +41,6 @@ class ExpenseListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 🔌 View binding
         nameExpense = view.findViewById(R.id.expenseName)
         amount = view.findViewById(R.id.amount)
         dateInput = view.findViewById(R.id.expenseDate)
@@ -52,7 +50,6 @@ class ExpenseListFragment : Fragment() {
         currencySpinner = view.findViewById(R.id.currencySpinner)
         convertSwitch = view.findViewById(R.id.convertSwitch)
         convertedCostText = view.findViewById(R.id.convertedCost)
-
 
         lifecycleScope.launch {
             try {
@@ -64,7 +61,6 @@ class ExpenseListFragment : Fragment() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 currencySpinner.adapter = adapter
 
-                // Optionally select CAD by default
                 val defaultIndex = currencyList.indexOf("cad")
                 if (defaultIndex != -1) {
                     currencySpinner.setSelection(defaultIndex)
@@ -76,30 +72,50 @@ class ExpenseListFragment : Fragment() {
             }
         }
 
-        // 📦 Load expenses from file
         expenseList = FileHelper.readFromFile(requireContext()).toMutableList()
 
-        // 🔁 Adapter with callback to update footer total
         adapter = RecycleAdapter(requireContext(), expenseList) {
             updateTotalExpense()
         }
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter.notifyDataSetChanged()
 
-        adapter.notifyDataSetChanged() // 👈 wakes up the UI with actual data
-
-        // ➕ Add expense
         submitButton.setOnClickListener {
-            val name = nameExpense.text.toString().trim()
-            val amt = amount.text.toString().trim()
-            val date = dateInput.text.toString().trim()
+            lifecycleScope.launch {
+                val name = nameExpense.text.toString().trim()
+                val amt = amount.text.toString().trim()
+                val date = dateInput.text.toString().trim()
 
-            if (name.isEmpty() || amt.isEmpty() || amt.toDoubleOrNull() == null || date.isEmpty()) {
-                Toast.makeText(requireContext(), "Invalid Input", Toast.LENGTH_SHORT).show()
-            } else {
-                expenseList.add(ExpenseItem(name, amt.toDouble(), date))
+                if (name.isEmpty() || amt.isEmpty() || amt.toDoubleOrNull() == null || date.isEmpty()) {
+                    Toast.makeText(requireContext(), "Invalid Input", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                var amountValue = amt.toDouble()
+
+                if (convertSwitch.isChecked) {
+                    val selectedCurrency = currencySpinner.selectedItem.toString().lowercase()
+                    try {
+                        val response = RetrofitInstance.api.getRate(selectedCurrency)
+                        val rateMap = response[selectedCurrency] as? Map<*, *>
+                        val rate = rateMap?.get("cad") as? Double
+
+                        if (rate == null) {
+                            throw Exception("Conversion rate not found for CAD")
+                        }
+
+                        amountValue *= rate
+                        convertedCostText.text = "≈ %.2f CAD".format(amountValue)
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), "Conversion failed", Toast.LENGTH_SHORT).show()
+                        Log.e("ConversionError", "Error: ${e.message}")
+                        return@launch
+                    }
+                }
+
+                expenseList.add(ExpenseItem(name, amountValue, date))
                 FileHelper.writeToFile(requireContext(), expenseList)
-                Log.d("FileHelper", "WRITE CALLED: ${expenseList.size}")
                 adapter.notifyDataSetChanged()
                 updateTotalExpense()
 
@@ -109,7 +125,6 @@ class ExpenseListFragment : Fragment() {
             }
         }
 
-        // 📆 Date picker
         dateInput.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
@@ -122,16 +137,19 @@ class ExpenseListFragment : Fragment() {
             ).show()
         }
 
-        // 💡 Navigate to details fragment
         financialTip.setOnClickListener {
             findNavController().navigate(R.id.action_expenseListFragment_to_expenseDetailsFragment)
         }
 
+        convertSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (!isChecked) {
+                convertedCostText.text = ""
+            }
+        }
 
         updateTotalExpense()
     }
 
-    // 📊 Update footer fragment total
     private fun updateTotalExpense() {
         val footer = childFragmentManager.findFragmentById(R.id.footerFragment) as? FooterFragment
         footer?.updateTotalExpensesDisplay(expenseList.sumOf { it.amount })

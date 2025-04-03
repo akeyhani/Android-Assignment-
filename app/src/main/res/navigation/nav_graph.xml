@@ -9,7 +9,6 @@
         android:name="com.example.expensetracker.ExpenseListFragment"
         android:label="Expense List">
 
-        <!-- 👇👇 THIS IS WHAT YOU'RE MISSING 👇👇 -->
         <action
             android:id="@+id/action_expenseListFragment_to_expenseDetailsFragment"
             app:destination="@id/expenseDetailsFragment"/>

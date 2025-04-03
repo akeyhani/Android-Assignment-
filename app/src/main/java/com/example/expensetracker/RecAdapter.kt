@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 class RecycleAdapter(
     private val context: Context,
     private val expenseList: MutableList<ExpenseItem>,
-    private val onDataChanged: () -> Unit // 👈 NEW: callback from fragment
+    private val onDataChanged: () -> Unit
 ) : RecyclerView.Adapter<RecView>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecView {

@@ -98,7 +98,7 @@
         android:layout_width="150dp"
         android:layout_height="48dp"
         android:layout_marginStart="200dp"
-        android:layout_marginTop="47dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="197dp"
         android:layout_marginBottom="495dp"
         android:text="Add Expense"
@@ -107,14 +107,14 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/expenseDate"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/expenseList"
         android:layout_width="400dp"
         android:layout_height="330dp"
         android:layout_marginStart="2dp"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="1dp"
         app:layout_constraintBottom_toBottomOf="parent"

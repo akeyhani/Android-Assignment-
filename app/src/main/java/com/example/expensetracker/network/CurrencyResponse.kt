@@ -1,4 +1,7 @@
 package com.example.expensetracker.network
 
-class CurrencyResponse {
-}
+import com.google.gson.annotations.SerializedName
+
+class CurrencyResponse (
+    val date: String,
+    val rates: Map<String, Double>)

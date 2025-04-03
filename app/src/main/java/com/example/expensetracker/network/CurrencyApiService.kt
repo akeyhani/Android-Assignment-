@@ -1,16 +1,19 @@
 package com.example.expensetracker.network
 
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface CurrencyApiService {
 
     @GET("currencies.json")
     suspend fun getCurrencies(): Map<String, String>
 
-    @GET("latest/currencies/{from}/{to}.json")
+    @GET("currencies/{from}.json")
     suspend fun getRate(
-        @retrofit2.http.Path("from") from: String,
-        @retrofit2.http.Path("to") to: String
+        @Path("from") from: String
     ): Map<String, Any>
+
+
 }
+
 
