@@ -61,6 +61,19 @@ class ExpenseListFragment : Fragment() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 currencySpinner.adapter = adapter
 
+                currencySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                        if (convertSwitch.isChecked) updateConvertedAmount()
+                    }
+
+
+
+                    override fun onNothingSelected(parent: AdapterView<*>) {}
+                }
+
+
+
+
                 val defaultIndex = currencyList.indexOf("cad")
                 if (defaultIndex != -1) {
                     currencySpinner.setSelection(defaultIndex)
@@ -71,6 +84,15 @@ class ExpenseListFragment : Fragment() {
                 e.printStackTrace()
             }
         }
+        amount.addTextChangedListener(object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (convertSwitch.isChecked) updateConvertedAmount()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
 
         expenseList = FileHelper.readFromFile(requireContext()).toMutableList()
 
@@ -154,4 +176,33 @@ class ExpenseListFragment : Fragment() {
         val footer = childFragmentManager.findFragmentById(R.id.footerFragment) as? FooterFragment
         footer?.updateTotalExpensesDisplay(expenseList.sumOf { it.amount })
     }
+
+
+    private fun updateConvertedAmount() {
+        val amountText = amount.text.toString().trim()
+        val selectedCurrency = currencySpinner.selectedItem?.toString()?.lowercase() ?: return
+
+        val amountValue = amountText.toDoubleOrNull() ?: return
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.getRate(selectedCurrency)
+                val rateMap = response[selectedCurrency] as? Map<*, *>
+                val rate = rateMap?.get("cad") as? Double
+
+                if (rate != null) {
+                    val converted = rate * amountValue
+                    convertedCostText.text = "≈ $converted CAD"
+                } else {
+                    convertedCostText.text = ""
+                }
+            } catch (e: Exception) {
+                Log.e("ConversionLive", "Failed to convert: ${e.message}")
+                convertedCostText.text = ""
+            }
+        }
+    }
+
 }
+
+
