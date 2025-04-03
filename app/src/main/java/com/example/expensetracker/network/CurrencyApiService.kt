@@ -7,6 +7,10 @@ interface CurrencyApiService {
     @GET("currencies.json")
     suspend fun getCurrencies(): Map<String, String>
 
-    @GET("latest/currencies/cad.json")
-    suspend fun getRates(): Map<String, Map<String, Double>>
+    @GET("latest/currencies/{from}/{to}.json")
+    suspend fun getRate(
+        @retrofit2.http.Path("from") from: String,
+        @retrofit2.http.Path("to") to: String
+    ): Map<String, Any>
 }
+

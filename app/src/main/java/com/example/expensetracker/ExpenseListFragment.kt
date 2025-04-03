@@ -12,8 +12,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
+import androidx.lifecycle.lifecycleScope
+import com.example.expensetracker.network.RetrofitInstance
+import kotlinx.coroutines.launch
 
 class ExpenseListFragment : Fragment() {
+
 
     private lateinit var nameExpense: EditText
     private lateinit var amount: EditText
@@ -23,6 +27,10 @@ class ExpenseListFragment : Fragment() {
     private lateinit var financialTip: Button
     private lateinit var expenseList: MutableList<ExpenseItem>
     private lateinit var adapter: RecycleAdapter
+    private lateinit var currencySpinner: Spinner
+    private lateinit var convertSwitch: Switch
+    private lateinit var convertedCostText: TextView
+    private var currencyList: List<String> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,6 +49,32 @@ class ExpenseListFragment : Fragment() {
         submitButton = view.findViewById(R.id.addExpense)
         financialTip = view.findViewById(R.id.finsTips)
         recyclerView = view.findViewById(R.id.expenseList)
+        currencySpinner = view.findViewById(R.id.currencySpinner)
+        convertSwitch = view.findViewById(R.id.convertSwitch)
+        convertedCostText = view.findViewById(R.id.convertedCost)
+
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.getCurrencies()
+                Log.d("CurrencyDebug", "Currencies fetched: $response")
+                currencyList = response.keys.sorted()
+
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencyList)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                currencySpinner.adapter = adapter
+
+                // Optionally select CAD by default
+                val defaultIndex = currencyList.indexOf("cad")
+                if (defaultIndex != -1) {
+                    currencySpinner.setSelection(defaultIndex)
+                }
+
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Failed to load currencies", Toast.LENGTH_SHORT).show()
+                e.printStackTrace()
+            }
+        }
 
         // 📦 Load expenses from file
         expenseList = FileHelper.readFromFile(requireContext()).toMutableList()
@@ -92,6 +126,7 @@ class ExpenseListFragment : Fragment() {
         financialTip.setOnClickListener {
             findNavController().navigate(R.id.action_expenseListFragment_to_expenseDetailsFragment)
         }
+
 
         updateTotalExpense()
     }

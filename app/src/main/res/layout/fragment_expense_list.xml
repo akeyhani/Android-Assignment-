@@ -76,52 +76,53 @@
         android:id="@+id/currencySpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/convertSwitch"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="16dp" />
+        app:layout_constraintTop_toBottomOf="@+id/convertSwitch" />
 
     <TextView
         android:id="@+id/convertedCost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
         android:text="Converted: $0.00"
-        android:textStyle="bold"
         android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@+id/currencySpinner"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="16dp"/>
+        app:layout_constraintTop_toBottomOf="@+id/currencySpinner" />
 
     <Button
         android:id="@+id/addExpense"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="124dp"
+        android:layout_width="150dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="200dp"
         android:layout_marginTop="47dp"
         android:layout_marginEnd="197dp"
         android:layout_marginBottom="495dp"
         android:text="Add Expense"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/expenseDate"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/expenseList"
-        android:layout_width="405dp"
-        android:layout_height="355dp"
-        android:layout_marginStart="1dp"
+        android:layout_width="400dp"
+        android:layout_height="330dp"
+        android:layout_marginStart="2dp"
         android:layout_marginTop="1dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addExpense"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.257" />
 
     <Button
         android:id="@+id/finsTips"
